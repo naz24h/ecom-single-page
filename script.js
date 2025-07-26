@@ -1,358 +1,722 @@
-// Countdown Timer with more accurate timing
-function initCountdown() {
-  // Set target date - 24 hours from now
-  const now = new Date();
-  const targetDate = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+// Bengali Shirt Store JavaScript
 
-  function updateTimer() {
-    const currentTime = new Date().getTime();
-    const timeLeft = targetDate.getTime() - currentTime;
+// Countdown Timer Functionality
+class CountdownTimer {
+  constructor() {
+    this.targetDate = this.calculateTargetDate();
+    this.elements = {
+      days: document.getElementById("days"),
+      hours: document.getElementById("hours"),
+      minutes: document.getElementById("minutes"),
+      seconds: document.getElementById("seconds"),
+    };
+    this.init();
+  }
 
-    if (timeLeft > 0) {
-      const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
-      const hours = Math.floor(
-        (timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
-      );
-      const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
-      const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+  calculateTargetDate() {
+    const now = new Date().getTime();
+    return (
+      now +
+      24 * 60 * 60 * 1000 +
+      23 * 60 * 60 * 1000 +
+      59 * 60 * 1000 +
+      54 * 1000
+    );
+  }
 
-      // Update display with leading zeros
-      document.getElementById("days").textContent = days
-        .toString()
-        .padStart(2, "0");
-      document.getElementById("hours").textContent = hours
-        .toString()
-        .padStart(2, "0");
-      document.getElementById("minutes").textContent = minutes
-        .toString()
-        .padStart(2, "0");
-      document.getElementById("seconds").textContent = seconds
-        .toString()
-        .padStart(2, "0");
-    } else {
-      // Timer expired
-      document.getElementById("days").textContent = "00";
-      document.getElementById("hours").textContent = "00";
-      document.getElementById("minutes").textContent = "00";
-      document.getElementById("seconds").textContent = "00";
+  updateCountdown() {
+    const now = new Date().getTime();
+    const distance = this.targetDate - now;
+
+    if (distance < 0) {
+      this.displayZeros();
+      return;
+    }
+
+    const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+    const hours = Math.floor(
+      (distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
+    );
+    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+    this.elements.days.textContent = days.toString().padStart(2, "0");
+    this.elements.hours.textContent = hours.toString().padStart(2, "0");
+    this.elements.minutes.textContent = minutes.toString().padStart(2, "0");
+    this.elements.seconds.textContent = seconds.toString().padStart(2, "0");
+  }
+
+  displayZeros() {
+    Object.values(this.elements).forEach((element) => {
+      element.textContent = "00";
+    });
+  }
+
+  init() {
+    this.updateCountdown();
+    setInterval(() => this.updateCountdown(), 1000);
+  }
+}
+
+// Reviews Carousel Handler
+class ReviewsCarousel {
+  constructor() {
+    this.carousel = document.getElementById("reviewsCarousel");
+    this.autoScrollInterval = null;
+    this.init();
+  }
+
+  init() {
+    if (!this.carousel) return;
+
+    this.startAutoScroll();
+    this.setupEventListeners();
+  }
+
+  startAutoScroll() {
+    this.autoScrollInterval = setInterval(() => {
+      this.scrollRight();
+
+      // Reset to beginning if at the end
+      if (
+        this.carousel.scrollLeft >=
+        this.carousel.scrollWidth - this.carousel.clientWidth
+      ) {
+        setTimeout(() => {
+          this.carousel.scrollTo({ left: 0, behavior: "smooth" });
+        }, 2000);
+      }
+    }, 4000);
+  }
+
+  stopAutoScroll() {
+    if (this.autoScrollInterval) {
+      clearInterval(this.autoScrollInterval);
     }
   }
 
-  // Update immediately and then every second
-  updateTimer();
-  setInterval(updateTimer, 1000);
-}
-
-// Enhanced Review Slider
-let slideIndex = 1;
-const totalSlides = 6;
-
-function showSlides(n) {
-  const slider = document.getElementById("reviewSlider");
-  const dots = document.querySelectorAll(".dot");
-
-  if (n > totalSlides) {
-    slideIndex = 1;
-  }
-  if (n < 1) {
-    slideIndex = totalSlides;
-  }
-
-  // Calculate transform based on slide index
-  const translateX = -(slideIndex - 1) * (200 + 15); // image width + gap
-  slider.style.transform = `translateX(${translateX}px)`;
-
-  // Update dots
-  dots.forEach((dot) => dot.classList.remove("active"));
-  if (dots[slideIndex - 1]) {
-    dots[slideIndex - 1].classList.add("active");
-  }
-}
-
-function changeSlide(n) {
-  slideIndex += n;
-  showSlides(slideIndex);
-}
-
-function currentSlide(n) {
-  slideIndex = n;
-  showSlides(slideIndex);
-}
-
-// Auto-slide functionality
-function autoSlide() {
-  slideIndex++;
-  showSlides(slideIndex);
-}
-
-// Quantity Control
-function initQuantityControls() {
-  const decreaseBtn = document.querySelector(".qty-decrease");
-  const increaseBtn = document.querySelector(".qty-increase");
-  const qtyInput = document.querySelector(".qty-number");
-
-  if (decreaseBtn && increaseBtn && qtyInput) {
-    decreaseBtn.addEventListener("click", function () {
-      let currentValue = parseInt(qtyInput.value);
-      if (currentValue > 1) {
-        qtyInput.value = currentValue - 1;
-        updateOrderSummary();
-      }
+  setupEventListeners() {
+    // Pause auto-scroll on hover
+    this.carousel.addEventListener("mouseenter", () => {
+      this.stopAutoScroll();
     });
 
-    increaseBtn.addEventListener("click", function () {
-      let currentValue = parseInt(qtyInput.value);
-      qtyInput.value = currentValue + 1;
-      updateOrderSummary();
+    // Resume auto-scroll when not hovering
+    this.carousel.addEventListener("mouseleave", () => {
+      this.startAutoScroll();
     });
 
-    qtyInput.addEventListener("change", function () {
-      let value = parseInt(this.value);
-      if (isNaN(value) || value < 1) {
-        this.value = 1;
-      }
-      updateOrderSummary();
+    // Touch events for mobile
+    let startX = 0;
+    let scrollLeft = 0;
+
+    this.carousel.addEventListener("touchstart", (e) => {
+      startX = e.touches[0].pageX - this.carousel.offsetLeft;
+      scrollLeft = this.carousel.scrollLeft;
+      this.stopAutoScroll();
     });
-  }
-}
 
-// Update Order Summary
-function updateOrderSummary() {
-  const quantity = parseInt(document.querySelector(".qty-number").value) || 1;
-  const unitPrice = 1250;
-  const shippingCost = 60;
+    this.carousel.addEventListener("touchend", () => {
+      this.startAutoScroll();
+    });
 
-  const subtotal = unitPrice * quantity;
-  const total = subtotal + shippingCost;
-
-  // Update subtotal
-  const subtotalElement = document.querySelector(".subtotal-amount");
-  if (subtotalElement) {
-    subtotalElement.textContent = `৳${subtotal.toLocaleString()}`;
-  }
-
-  // Update total
-  const totalElement = document.querySelector(".total-amount");
-  if (totalElement) {
-    totalElement.textContent = `৳${total.toLocaleString()}`;
-  }
-
-  // Update item price if quantity > 1
-  const itemPriceElement = document.querySelector(".item-price");
-  if (itemPriceElement) {
-    itemPriceElement.textContent = `৳${subtotal.toLocaleString()}`;
-  }
-}
-
-// Smooth Scroll to Order Form
-function initOrderButtons() {
-  const orderButtons = document.querySelectorAll(".order-now-btn");
-  const orderForm = document.querySelector(".order-form-wrapper");
-
-  orderButtons.forEach((button) => {
-    button.addEventListener("click", function (e) {
+    this.carousel.addEventListener("touchmove", (e) => {
+      if (!startX) return;
       e.preventDefault();
-      if (orderForm) {
-        orderForm.scrollIntoView({
-          behavior: "smooth",
-          block: "start",
-        });
-
-        // Add a subtle animation to the form
-        orderForm.style.transform = "scale(1.02)";
-        setTimeout(() => {
-          orderForm.style.transform = "scale(1)";
-        }, 200);
-      }
+      const x = e.touches[0].pageX - this.carousel.offsetLeft;
+      const walk = (x - startX) * 2;
+      this.carousel.scrollLeft = scrollLeft - walk;
     });
-  });
+  }
+
+  scrollLeft() {
+    const scrollAmount = 280;
+    this.carousel.scrollBy({ left: -scrollAmount, behavior: "smooth" });
+  }
+
+  scrollRight() {
+    const scrollAmount = 280;
+    this.carousel.scrollBy({ left: scrollAmount, behavior: "smooth" });
+  }
 }
 
-// Form Validation
-function initFormValidation() {
-  const completeOrderBtn = document.querySelector(".complete-order-btn");
-  const form = document.querySelector(".checkout-form");
+// Form Handler Class
+class OrderFormHandler {
+  constructor() {
+    this.form = document.getElementById("orderForm");
+    this.orderButtons = document.querySelectorAll(".order-btn");
+    this.init();
+  }
 
-  if (completeOrderBtn && form) {
-    completeOrderBtn.addEventListener("click", function (e) {
-      e.preventDefault();
+  init() {
+    if (!this.form) return;
 
-      const requiredFields = form.querySelectorAll("[required]");
-      let isValid = true;
-      let firstInvalidField = null;
+    this.form.addEventListener("submit", (e) => this.handleSubmit(e));
+    this.orderButtons.forEach((button) => {
+      button.addEventListener("click", () => this.scrollToForm());
+    });
+  }
 
-      // Reset previous error states
-      requiredFields.forEach((field) => {
-        field.style.borderColor = "#ced4da";
+  handleSubmit(e) {
+    e.preventDefault();
+
+    const formData = this.getFormData();
+
+    if (this.validateForm(formData)) {
+      this.showLoading();
+      this.simulateOrderSubmission(formData);
+    }
+  }
+
+  getFormData() {
+    return {
+      name: document.getElementById("customerName")?.value.trim() || "",
+      phone: document.getElementById("phoneNumber")?.value.trim() || "",
+      address: document.getElementById("address")?.value.trim() || "",
+      size: document.querySelector('input[name="size"]:checked')?.value || "",
+      shipping:
+        document.querySelector('input[name="shipping"]:checked')?.value ||
+        "dhaka",
+    };
+  }
+
+  validateForm(data) {
+    const errors = [];
+
+    if (!data.name) errors.push("নাম প্রয়োজন");
+    if (!data.phone) errors.push("মোবাইল নাম্বার প্রয়োজন");
+    if (!data.address) errors.push("ঠিকানা প্রয়োজন");
+    if (!data.size) errors.push("সাইজ নির্বাচন করুন");
+
+    if (data.phone && !this.isValidPhoneNumber(data.phone)) {
+      errors.push("সঠিক ১১ সংখ্যার মোবাইল নাম্বার দিন");
+    }
+
+    if (errors.length > 0) {
+      alert("ত্রুটি:\n" + errors.join("\n"));
+      return false;
+    }
+
+    return true;
+  }
+
+  isValidPhoneNumber(phone) {
+    const phoneRegex = /^(\+88)?01[3-9]\d{8}$/;
+    return phoneRegex.test(phone.replace(/\s/g, ""));
+  }
+
+  showLoading() {
+    const submitButton = this.form.querySelector('button[type="submit"]');
+    if (submitButton) {
+      submitButton.classList.add("loading");
+      submitButton.textContent = "অর্ডার প্রক্রিয়াকরণ...";
+    }
+  }
+
+  hideLoading() {
+    const submitButton = this.form.querySelector('button[type="submit"]');
+    if (submitButton) {
+      submitButton.classList.remove("loading");
+      submitButton.textContent = "🔒 কনফার্ম অর্ডার ৳ ১,৬০০";
+    }
+  }
+
+  simulateOrderSubmission(formData) {
+    setTimeout(() => {
+      this.hideLoading();
+      this.showSuccessMessage(formData);
+      this.resetForm();
+    }, 2000);
+  }
+
+  showSuccessMessage(formData) {
+    const message = `
+অর্ডার সফলভাবে জমা দেওয়া হয়েছে! 🎉
+
+অর্ডারের বিবরণ:
+নাম: ${formData.name}
+ফোন: ${formData.phone}
+সাইজ: ${formData.size}
+শিপিং: ${formData.shipping === "dhaka" ? "ঢাকার ভিতরে" : "ঢাকার বাইরে"}
+
+আমরা শীঘ্রই আপনার সাথে যোগাযোগ করব।
+ধন্যবাদ!
+        `;
+    alert(message);
+  }
+
+  resetForm() {
+    this.form.reset();
+  }
+
+  scrollToForm() {
+    const checkoutSection = document.querySelector(".bg-green-50");
+    if (checkoutSection) {
+      checkoutSection.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
       });
+    }
+  }
+}
 
-      // Validate each required field
-      requiredFields.forEach((field) => {
-        if (!field.value.trim()) {
-          field.style.borderColor = "#dc3545";
-          field.style.boxShadow = "0 0 0 0.2rem rgba(220,53,69,.25)";
+// Checkout Manager Class
+class CheckoutManager {
+  constructor() {
+    this.form = document.getElementById("orderForm");
+    this.totalAmountElement = document.getElementById("totalAmount");
+    this.basePrice = 1470;
+    this.shippingRates = {
+      dhaka: 130,
+      outside: 70,
+    };
+    this.init();
+  }
+
+  init() {
+    if (!this.form) return;
+
+    this.setupEventListeners();
+    this.updateTotal();
+  }
+
+  setupEventListeners() {
+    // Shipping option change
+    const shippingInputs = document.querySelectorAll('input[name="shipping"]');
+    shippingInputs.forEach((input) => {
+      input.addEventListener("change", () => this.updateTotal());
+    });
+
+    // Real-time validation
+    const inputs = this.form.querySelectorAll("input, textarea");
+    inputs.forEach((input) => {
+      input.addEventListener("blur", () => this.validateField(input));
+      input.addEventListener("input", () => this.clearError(input));
+    });
+  }
+
+  updateTotal() {
+    const selectedShipping = document.querySelector(
+      'input[name="shipping"]:checked'
+    );
+    const shippingCost = selectedShipping
+      ? this.shippingRates[selectedShipping.value]
+      : this.shippingRates.dhaka;
+    const total = this.basePrice + shippingCost;
+
+    if (this.totalAmountElement) {
+      this.totalAmountElement.textContent = `৳ ${this.formatBengaliNumber(
+        total
+      )}`;
+    }
+
+    // Update button text
+    const submitButton = document.querySelector('button[type="submit"]');
+    if (submitButton && !submitButton.classList.contains("loading")) {
+      submitButton.textContent = `🔒 কনফার্ম অর্ডার ৳ ${this.formatBengaliNumber(
+        total
+      )}`;
+    }
+  }
+
+  formatBengaliNumber(number) {
+    return number.toLocaleString("bn-BD");
+  }
+
+  validateField(field) {
+    const value = field.value.trim();
+    let isValid = true;
+    let errorMessage = "";
+
+    // Clear previous errors
+    this.clearError(field);
+
+    // Validation rules
+    switch (field.id) {
+      case "customerName":
+        if (!value) {
+          errorMessage = "নাম প্রয়োজন";
           isValid = false;
-
-          if (!firstInvalidField) {
-            firstInvalidField = field;
-          }
+        } else if (value.length < 2) {
+          errorMessage = "নাম কমপক্ষে ২ অক্ষরের হতে হবে";
+          isValid = false;
         }
-      });
+        break;
 
-      if (isValid) {
-        // Show success message
-        showSuccessMessage();
-      } else {
-        // Focus on first invalid field
-        if (firstInvalidField) {
-          firstInvalidField.focus();
-          firstInvalidField.scrollIntoView({
-            behavior: "smooth",
-            block: "center",
-          });
+      case "phoneNumber":
+        if (!value) {
+          errorMessage = "মোবাইল নম্বর প্রয়োজন";
+          isValid = false;
+        } else if (!this.isValidPhoneNumber(value)) {
+          errorMessage = "সঠিক ১১ সংখ্যার মোবাইল নম্বর দিন";
+          isValid = false;
         }
+        break;
 
-        // Show error message
-        showErrorMessage("দয়া করে সকল প্রয়োজনীয় তথ্য পূরণ করুন।");
-      }
-    });
+      case "address":
+        if (!value) {
+          errorMessage = "ঠিকানা প্রয়োজন";
+          isValid = false;
+        } else if (value.length < 10) {
+          errorMessage = "সম্পূর্ণ ঠিকানা দিন";
+          isValid = false;
+        }
+        break;
+    }
+
+    if (!isValid) {
+      this.showError(field, errorMessage);
+    }
+
+    return isValid;
+  }
+
+  isValidPhoneNumber(phone) {
+    const cleanPhone = phone.replace(/\s/g, "");
+    const phoneRegex = /^(\+88)?01[3-9]\d{8}$/;
+    return phoneRegex.test(cleanPhone);
+  }
+
+  showError(field, message) {
+    field.classList.add("error");
+
+    // Remove existing error message
+    const existingError = field.parentNode.querySelector(".error-message");
+    if (existingError) {
+      existingError.remove();
+    }
+
+    // Add new error message
+    const errorDiv = document.createElement("div");
+    errorDiv.className = "error-message";
+    errorDiv.textContent = message;
+    field.parentNode.appendChild(errorDiv);
+  }
+
+  clearError(field) {
+    field.classList.remove("error");
+    const errorMessage = field.parentNode.querySelector(".error-message");
+    if (errorMessage) {
+      errorMessage.remove();
+    }
   }
 }
 
-// Success Message
-function showSuccessMessage() {
-  const message = document.createElement("div");
-  message.className = "success-message";
-  message.innerHTML = `
-        <div style="
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: #28a745;
-            color: white;
-            padding: 20px 30px;
-            border-radius: 8px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-            z-index: 1000;
-            text-align: center;
-            font-size: 16px;
-            font-weight: 600;
-        ">
-            ✅ অর্ডার সফলভাবে সম্পন্ন হয়েছে!<br>
-            <small style="font-size: 14px; opacity: 0.9;">আমরা শীঘ্রই আপনার সাথে যোগাযোগ করব।</small>
-        </div>
-    `;
+// Utility Functions
+const Utils = {
+  // Smooth scroll to top
+  scrollToTop() {
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  },
 
-  document.body.appendChild(message);
+  // Format Bengali numbers
+  formatBengaliNumber(number) {
+    const bengaliDigits = ["০", "১", "২", "৩", "৪", "৫", "৬", "৭", "৮", "৯"];
+    return number.toString().replace(/\d/g, (digit) => bengaliDigits[digit]);
+  },
 
-  setTimeout(() => {
-    message.remove();
-  }, 4000);
+  // Local storage helpers
+  saveToLocalStorage(key, data) {
+    try {
+      localStorage.setItem(key, JSON.stringify(data));
+    } catch (error) {
+      console.error("Error saving to localStorage:", error);
+    }
+  },
+
+  getFromLocalStorage(key) {
+    try {
+      const data = localStorage.getItem(key);
+      return data ? JSON.parse(data) : null;
+    } catch (error) {
+      console.error("Error reading from localStorage:", error);
+      return null;
+    }
+  },
+
+  // Debounce function
+  debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+      const later = () => {
+        clearTimeout(timeout);
+        func(...args);
+      };
+      clearTimeout(timeout);
+      timeout = setTimeout(later, wait);
+    };
+  },
+
+  // Throttle function
+  throttle(func, limit) {
+    let inThrottle;
+    return function () {
+      const args = arguments;
+
+      if (!inThrottle) {
+        func.apply(this, args);
+        inThrottle = true;
+        setTimeout(() => (inThrottle = false), limit);
+      }
+    };
+  },
+};
+
+// Analytics and Tracking
+class OrderAnalytics {
+  constructor() {
+    this.events = [];
+    this.sessionId = this.generateSessionId();
+  }
+
+  generateSessionId() {
+    return Date.now().toString(36) + Math.random().toString(36).substr(2);
+  }
+
+  track(eventName, data = {}) {
+    const event = {
+      name: eventName,
+      data: data,
+      timestamp: new Date().toISOString(),
+      url: window.location.href,
+      sessionId: this.sessionId,
+      userAgent: navigator.userAgent,
+    };
+
+    this.events.push(event);
+    console.log("Analytics Event:", event);
+
+    // Here you would send to your analytics service
+    // this.sendToAnalytics(event);
+  }
+
+  trackPageView() {
+    this.track("page_view", {
+      referrer: document.referrer,
+      title: document.title,
+    });
+  }
+
+  trackFieldFocus(fieldName) {
+    this.track("field_focus", { field: fieldName });
+  }
+
+  trackSizeSelection(size) {
+    this.track("size_selected", { size: size });
+  }
+
+  trackShippingSelection(shipping) {
+    this.track("shipping_selected", { shipping: shipping });
+  }
+
+  trackOrderAttempt(formData) {
+    this.track("order_attempt", {
+      size: formData.size,
+      shipping: formData.shipping,
+      hasValidPhone: this.isValidPhone(formData.phone),
+    });
+  }
+
+  trackOrderSuccess(formData) {
+    this.track("order_success", {
+      size: formData.size,
+      shipping: formData.shipping,
+    });
+  }
+
+  trackReviewsCarouselInteraction(action) {
+    this.track("reviews_carousel", { action: action });
+  }
+
+  isValidPhone(phone) {
+    const phoneRegex = /^(\+88)?01[3-9]\d{8}$/;
+    return phoneRegex.test(phone.replace(/\s/g, ""));
+  }
 }
 
-// Error Message
-function showErrorMessage(text) {
-  const message = document.createElement("div");
-  message.className = "error-message";
-  message.innerHTML = `
-        <div style="
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: #dc3545;
-            color: white;
-            padding: 15px 20px;
-            border-radius: 6px;
-            box-shadow: 0 3px 10px rgba(0,0,0,0.3);
-            z-index: 1000;
-            font-size: 14px;
-            font-weight: 500;
-        ">
-            ❌ ${text}
-        </div>
-    `;
+// Global function for reviews carousel navigation
+function scrollReviews(direction) {
+  const carousel = document.getElementById("reviewsCarousel");
+  if (!carousel) return;
 
-  document.body.appendChild(message);
+  const scrollAmount = 280; // Width of one review card plus gap
 
-  setTimeout(() => {
-    message.remove();
-  }, 3000);
+  if (direction === "left") {
+    carousel.scrollBy({ left: -scrollAmount, behavior: "smooth" });
+  } else {
+    carousel.scrollBy({ left: scrollAmount, behavior: "smooth" });
+  }
+
+  // Track interaction
+  if (window.analytics) {
+    window.analytics.trackReviewsCarouselInteraction(direction);
+  }
 }
 
-// Button Click Animations
-function initButtonAnimations() {
-  const buttons = document.querySelectorAll("button");
+// Initialize Application
+document.addEventListener("DOMContentLoaded", () => {
+  // Initialize all components
+  const countdownTimer = new CountdownTimer();
+  const reviewsCarousel = new ReviewsCarousel();
+  const orderFormHandler = new OrderFormHandler();
+  const checkoutManager = new CheckoutManager();
 
-  buttons.forEach((button) => {
-    button.addEventListener("click", function () {
-      this.style.transform = "scale(0.95)";
-      setTimeout(() => {
-        this.style.transform = "scale(1)";
-      }, 150);
+  // Initialize analytics
+  window.analytics = new OrderAnalytics();
+  window.analytics.trackPageView();
+
+  // Track form interactions
+  document.querySelectorAll("input, textarea").forEach((field) => {
+    field.addEventListener("focus", () => {
+      window.analytics.trackFieldFocus(field.id || field.name);
     });
   });
-}
 
-// Touch/Swipe support for mobile slider
-function initTouchSupport() {
-  const slider = document.querySelector(".review-images-container");
-  let startX = 0;
-  let currentX = 0;
-  let isDragging = false;
-
-  if (slider) {
-    slider.addEventListener("touchstart", function (e) {
-      startX = e.touches[0].clientX;
-      isDragging = true;
+  // Track size selection
+  document.querySelectorAll('input[name="size"]').forEach((radio) => {
+    radio.addEventListener("change", () => {
+      window.analytics.trackSizeSelection(radio.value);
     });
+  });
 
-    slider.addEventListener("touchmove", function (e) {
-      if (!isDragging) return;
-      currentX = e.touches[0].clientX;
+  // Track shipping selection
+  document.querySelectorAll('input[name="shipping"]').forEach((radio) => {
+    radio.addEventListener("change", () => {
+      window.analytics.trackShippingSelection(radio.value);
     });
+  });
 
-    slider.addEventListener("touchend", function (e) {
-      if (!isDragging) return;
-      isDragging = false;
+  // Add scroll to top functionality
+  const scrollToTopButton = document.createElement("button");
+  scrollToTopButton.innerHTML = `
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="white" viewBox="0 0 24 24">
+  <path d="m12 6.414 7.293 7.293 1.414-1.414L12 3.586l-8.707 8.707 1.414 1.414L12 6.414z"/>
+  <path d="m3.293 18.293 1.414 1.414L12 12.414l7.293 7.293 1.414-1.414L12 9.586l-8.707 8.707z"/>
+</svg>
+`;
 
-      const diffX = startX - currentX;
+  scrollToTopButton.className =
+    "fixed bottom-4 right-4 bg-[#ef4444] text-white p-3 rounded-full shadow-lg hover:bg-red-700 transition-colors z-50 hidden";
+  scrollToTopButton.setAttribute("aria-label", "Scroll to top");
+  scrollToTopButton.onclick = Utils.scrollToTop;
+  document.body.appendChild(scrollToTopButton);
 
-      if (Math.abs(diffX) > 50) {
-        // Minimum swipe distance
-        if (diffX > 0) {
-          changeSlide(1); // Swipe left - next slide
-        } else {
-          changeSlide(-1); // Swipe right - previous slide
-        }
-      }
+  // Show/hide scroll to top button with throttling
+  const throttledScroll = Utils.throttle(() => {
+    if (window.pageYOffset > 300) {
+      scrollToTopButton.classList.remove("hidden");
+    } else {
+      scrollToTopButton.classList.add("hidden");
+    }
+  }, 100);
+
+  window.addEventListener("scroll", throttledScroll);
+
+  // Add keyboard navigation
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") {
+      // Close any modals or reset form focus
+      document.activeElement.blur();
+    }
+
+    // Arrow key navigation for reviews carousel
+    if (e.key === "ArrowLeft" && e.target.id === "reviewsCarousel") {
+      scrollReviews("left");
+    } else if (e.key === "ArrowRight" && e.target.id === "reviewsCarousel") {
+      scrollReviews("right");
+    }
+  });
+
+  // Performance monitoring
+  window.addEventListener("load", () => {
+    const loadTime = performance.now();
+    console.log(`Page loaded in ${loadTime.toFixed(2)}ms`);
+    window.analytics.track("page_load_time", { loadTime: loadTime });
+  });
+
+  // Add smooth scrolling enhancement for mobile
+  if (window.innerWidth <= 768) {
+    const form = document.getElementById("orderForm");
+    if (form) {
+      const inputs = form.querySelectorAll("input, textarea");
+
+      inputs.forEach((input) => {
+        input.addEventListener("focus", () => {
+          setTimeout(() => {
+            input.scrollIntoView({
+              behavior: "smooth",
+              block: "center",
+            });
+          }, 300);
+        });
+      });
+    }
+  }
+
+  // Add error handling for images
+  document.querySelectorAll("img").forEach((img) => {
+    img.addEventListener("error", function () {
+      this.src = "/placeholder.svg?height=200&width=200";
+      this.alt = "ছবি লোড হচ্ছে না";
+    });
+  });
+
+  // Add connection status indicator
+  window.addEventListener("online", () => {
+    console.log("Connection restored");
+  });
+
+  window.addEventListener("offline", () => {
+    console.log("Connection lost");
+    alert("ইন্টারনেট সংযোগ নেই। অনুগ্রহ করে আপনার সংযোগ চেক করুন।");
+  });
+
+  // Save form data to prevent loss
+  const form = document.getElementById("orderForm");
+  if (form) {
+    const saveFormData = Utils.debounce(() => {
+      const formData = {
+        name: document.getElementById("customerName")?.value || "",
+        phone: document.getElementById("phoneNumber")?.value || "",
+        address: document.getElementById("address")?.value || "",
+      };
+      Utils.saveToLocalStorage("formData", formData);
+    }, 1000);
+
+    // Save on input
+    form.addEventListener("input", saveFormData);
+
+    // Restore form data on page load
+    const savedData = Utils.getFromLocalStorage("formData");
+    if (savedData) {
+      const nameField = document.getElementById("customerName");
+      const phoneField = document.getElementById("phoneNumber");
+      const addressField = document.getElementById("address");
+
+      if (nameField && savedData.name) nameField.value = savedData.name;
+      if (phoneField && savedData.phone) phoneField.value = savedData.phone;
+      if (addressField && savedData.address)
+        addressField.value = savedData.address;
+    }
+
+    // Clear saved data on successful submission
+    form.addEventListener("submit", () => {
+      Utils.saveToLocalStorage("formData", null);
     });
   }
+});
+
+// Export for potential module use
+if (typeof module !== "undefined" && module.exports) {
+  module.exports = {
+    CountdownTimer,
+    ReviewsCarousel,
+    OrderFormHandler,
+    CheckoutManager,
+    Utils,
+    OrderAnalytics,
+  };
 }
-
-// Initialize all functions when DOM is loaded
-document.addEventListener("DOMContentLoaded", function () {
-  initCountdown();
-  initQuantityControls();
-  initOrderButtons();
-  initFormValidation();
-  initButtonAnimations();
-  initTouchSupport();
-
-  // Initialize slider
-  showSlides(slideIndex);
-
-  // Auto-slide every 4 seconds
-  setInterval(autoSlide, 4000);
-
-  // Initial order summary update
-  updateOrderSummary();
-
-  console.log("🚀 Page initialized successfully!");
-});
-
-// Handle window resize for responsive adjustments
-window.addEventListener("resize", function () {
-  // Recalculate slider position on resize
-  showSlides(slideIndex);
-});

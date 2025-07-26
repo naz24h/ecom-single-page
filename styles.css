@@ -1,0 +1,291 @@
+/* Custom CSS for Bengali Checkout Page */
+
+body {
+  font-family: "Noto Sans Bengali", sans-serif;
+  background-color: #f0fdf4; /* Light green background */
+}
+
+/* Form Styling */
+input[type="text"],
+input[type="tel"],
+textarea {
+  transition: all 0.3s ease;
+}
+
+input[type="text"]:focus,
+input[type="tel"]:focus,
+textarea:focus {
+  box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.1);
+}
+
+#orderForm input:focus,
+#orderForm textarea:focus {
+  border-color: #10b981;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+}
+
+/* Radio Button Styling */
+input[type="radio"] {
+  width: 18px;
+  height: 18px;
+  accent-color: #0d9488;
+}
+
+/* Product Card Styling */
+.product-card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.product-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+/* Order Summary Styling */
+.order-summary {
+  position: sticky;
+  top: 20px;
+}
+
+/* Button Styling */
+button[type="submit"] {
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(13, 148, 136, 0.3);
+}
+
+button[type="submit"]:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(13, 148, 136, 0.4);
+}
+
+.order-btn {
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.order-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Countdown Timer Styling */
+.countdown-box {
+  background: white;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Service Icons Animation */
+.text-center:hover .w-16 {
+  transform: scale(1.1);
+  transition: transform 0.3s ease;
+}
+
+/* Reviews Carousel Styling */
+#reviewsCarousel {
+  scroll-behavior: smooth;
+}
+
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .countdown-box {
+    min-width: 45px;
+    padding: 8px;
+  }
+
+  .countdown-box .text-xl {
+    font-size: 1.25rem;
+  }
+
+  .container {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .grid {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  .order-summary {
+    position: static;
+  }
+
+  #reviewsCarousel {
+    scroll-snap-type: x mandatory;
+  }
+
+  #reviewsCarousel > div {
+    scroll-snap-align: start;
+  }
+}
+
+/* Loading State */
+.loading {
+  opacity: 0.7;
+  pointer-events: none;
+  position: relative;
+}
+
+.loading::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 20px;
+  height: 20px;
+  margin: -10px 0 0 -10px;
+  border: 2px solid #ffffff;
+  border-radius: 50%;
+  border-top-color: transparent;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Smooth Scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/* Form Validation Styling */
+.error {
+  border-color: #ef4444 !important;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1) !important;
+}
+
+.error-message {
+  color: #ef4444;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+}
+
+/* Success State */
+.success {
+  border-color: #10b981 !important;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1) !important;
+}
+
+/* Navigation Arrows Animation */
+button[onclick*="scrollReviews"] {
+  transition: all 0.3s ease;
+}
+
+button[onclick*="scrollReviews"]:hover {
+  background-color: rgba(0, 0, 0, 0.8) !important;
+  transform: scale(1.1);
+}
+
+/* Badge Styling */
+.badge {
+  animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+  0%,
+  20%,
+  50%,
+  80%,
+  100% {
+    transform: translateY(0) rotate(12deg);
+  }
+  40% {
+    transform: translateY(-5px) rotate(12deg);
+  }
+  60% {
+    transform: translateY(-3px) rotate(12deg);
+  }
+}
+
+/* Green Background Section */
+.bg-green-50 {
+  background-color: #f0fdf4;
+}
+
+/* Print Styles */
+@media print {
+  .countdown-box,
+  .order-btn,
+  #orderForm {
+    display: none;
+  }
+
+  body {
+    background: white !important;
+  }
+
+  .bg-green-50 {
+    background: white !important;
+  }
+}
+
+/* Dark mode support (optional) */
+@media (prefers-color-scheme: dark) {
+  /* Add dark mode styles if needed */
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .countdown-box {
+    border: 2px solid white;
+  }
+
+  button {
+    border: 2px solid currentColor;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .countdown-box {
+    animation: none;
+  }
+
+  * {
+    transition: none !important;
+    animation: none !important;
+  }
+}
